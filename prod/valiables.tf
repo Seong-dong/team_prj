@@ -10,10 +10,10 @@ variable "prod_name" {
     default = "22shop"
 }
 
-variable "igw_id" {
-    description = "value"
-    type = string
-}
+# variable "igw_id" {
+#     description = "value"
+#     type = string
+# }
 
 variable "subnet-az-list" {
     description = "Subnet available zone & cidr"

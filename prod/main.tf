@@ -36,6 +36,20 @@ module "route_public" {
     vpc_id = module.vpc_hq.vpc_hq_id
     
 }
+
+module "route_add" {
+    source = "../modules/route-add"
+    route_public_id = module.route_public.route_public_id
+    igw_id = module.vpc_igw.igw_id
+}
+
+module "route_association" {
+    source = "../modules/route-association"
+    route_table_id = module.route_public.route_public_id
+    subnet_ids = [module.subnet_list.subnet.zone-a.id, module.subnet_list.subnet.zone-c.id]
+
+  
+}
 # EKS테스트 할때 활성
 # module "ecr" {
 #     source = "../modules/ecr"

@@ -1,9 +1,4 @@
-variable "vpc_id" {
-    description = "set vpc id"
-    type = string
-}
-
-variable "tag_name" {
+variable "route_public_id" {
     description = "value"
     type = string
 }
