@@ -1,27 +1,20 @@
 //ecr make
-provider "aws" {
-    region = "ap-northeast-2"
-
-    #2.x버전의 AWS공급자 허용
-    version = "~> 2.0"
-  
-}
-
-resource "aws_ecr_repository" "foo" {
-  name                 = "demo-flask-backend"
+resource "aws_ecr_repository" "ecr" {
+  for_each = toset(var.names_list)
+  name                 = each.value
   image_tag_mutability = "MUTABLE"
   image_scanning_configuration {
     scan_on_push = true
   }
 }
 
-resource "aws_ecr_repository" "bar" {
-  name                 = "demo-frontend"
-  image_tag_mutability = "MUTABLE"
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+# resource "aws_ecr_repository" "bar" {
+#   name                 = "demo-frontend"
+#   image_tag_mutability = "MUTABLE"
+#   image_scanning_configuration {
+#     scan_on_push = true
+#   }
+# }
 # resource "null_resource" "null_for_ecr_get_login_password" {
 #   provisioner "local-exec" {
 #     command = <<EOF

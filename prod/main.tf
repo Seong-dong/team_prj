@@ -1,3 +1,5 @@
+// prod - main
+
 provider "aws" {
     region = "ap-northeast-2"
 
@@ -6,34 +8,47 @@ provider "aws" {
   
 }
 
+# module "vpc_hq" {
 module "vpc_hq" {
     source = "../modules/vpc"
 
-    cidr_block = var.cidr_block
+    cidr_block = "10.3.0.0/16"
     
 }
-# resource "aws_vpc" "vpcHq" {
-#     cidr_block       = "10.3.0.0/16"
-#     // instance_tenancy = "default"
 
-#     tags = {
-#     Name = "test"
-#     }
-# }
+module "vpc_igw" {
+    source = "../modules/igw"
+
+    vpc_id = module.vpc_hq.vpc_hq_id
+}
+
 module "subnet_list" {
-  
-}
-resource "aws_subnet" "subnets" {
-    vpc_id     = module.vpc_hq.vpc_hq_id
-    
-    for_each = var.subnet-az-list
-    availability_zone = each.value.name
-    cidr_block = each.value.cidr
+    source = "../modules/vpc-subnet"
 
-    map_public_ip_on_launch = true
-    
-    # tags = {
-    # # Name = "${each.value.name}"
-    # Name = module.vpc_hq.vpcHq.id
-    # }
+    vpc_id = module.vpc_hq.vpc_hq_id
+    subnet-az-list = {
+        "zone-a" = {
+            name = "ap-northeast-2a"
+            cidr = "10.3.1.0/24"
+        }
+        "zone-b" = {
+            name = "ap-northeast-2b"
+            cidr = "10.3.2.0/24"
+        }
+        "zone-c" = {
+            name = "ap-northeast-2c"
+            cidr = "10.3.3.0/24"
+        }
+        "zone-d" = {
+            name = "ap-northeast-2d"
+            cidr = "10.3.4.0/24"
+        }
+    }
 }
+
+module "ecr" {
+    source = "../modules/ecr"
+
+    names_list = ["web", "nginx", "mariadb"]
+}
+
