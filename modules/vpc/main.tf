@@ -9,6 +9,6 @@ resource "aws_vpc" "vpc-hq" {
 
 
     tags = {
-    Name = "test"
+        Name = "${var.tag_name}-vpc"
     }
 }

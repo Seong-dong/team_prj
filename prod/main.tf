@@ -11,14 +11,14 @@ provider "aws" {
 # module "vpc_hq" {
 module "vpc_hq" {
     source = "../modules/vpc"
-
+    tag_name = var.prod_name
     cidr_block = "10.3.0.0/16"
     
 }
 
 module "vpc_igw" {
     source = "../modules/igw"
-
+    tag_name = var.prod_name
     vpc_id = module.vpc_hq.vpc_hq_id
 }
 
@@ -26,29 +26,20 @@ module "subnet_list" {
     source = "../modules/vpc-subnet"
 
     vpc_id = module.vpc_hq.vpc_hq_id
-    subnet-az-list = {
-        "zone-a" = {
-            name = "ap-northeast-2a"
-            cidr = "10.3.1.0/24"
-        }
-        "zone-b" = {
-            name = "ap-northeast-2b"
-            cidr = "10.3.2.0/24"
-        }
-        "zone-c" = {
-            name = "ap-northeast-2c"
-            cidr = "10.3.3.0/24"
-        }
-        "zone-d" = {
-            name = "ap-northeast-2d"
-            cidr = "10.3.4.0/24"
-        }
-    }
+    subnet-az-list = var.subnet-az-list
 }
 
-module "ecr" {
-    source = "../modules/ecr"
-
-    names_list = ["web", "nginx", "mariadb"]
+// public route
+module "route_public" {
+    source = "../modules/route-table"
+    tag_name = var.prod_name
+    vpc_id = module.vpc_hq.vpc_hq_id
+    
 }
+# EKS테스트 할때 활성
+# module "ecr" {
+#     source = "../modules/ecr"
+
+#     names_list = ["web", "nginx", "mariadb"]
+# }
 

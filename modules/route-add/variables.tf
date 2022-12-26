@@ -7,3 +7,8 @@ variable "tag_name" {
     description = "value"
     type = string
 }
+
+variable "igw_id" {
+    description = "value"
+    type = string
+}
