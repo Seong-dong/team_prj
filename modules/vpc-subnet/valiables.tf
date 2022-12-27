@@ -3,6 +3,11 @@ variable "vpc_id" {
     type = string
 }
 
+variable "vpc_name" {
+    description = "set vpc name"
+    type = string
+}
+
 // reference | https://github.com/davidcsi/terraform/blob/master/healthchecks/main.tf
 variable "subnet-az-list" {
     description = "Subnet available zone & cidr"
@@ -25,5 +30,8 @@ variable "subnet-az-list" {
     #         cidr = "10.3.4.0/24"
     #     }
     # }
-  
+}
+
+variable "public_ip_on" {
+  type = bool
 }

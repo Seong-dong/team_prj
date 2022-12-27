@@ -1,13 +1,13 @@
 # variable "cidr_block" {
 #     type = string
 #     default = "10.3.0.0/16"
-  
+
 # }
 
 variable "prod_name" {
-    description = "value"
-    type = string
-    default = "22shop"
+  description = "value"
+  type        = string
+  default     = "22shop"
 }
 
 # variable "igw_id" {
@@ -16,25 +16,25 @@ variable "prod_name" {
 # }
 
 variable "subnet-az-list" {
-    description = "Subnet available zone & cidr"
-    type = map(map(string))
-    default = {
-        "zone-a" = {
-            name = "ap-northeast-2a"
-            cidr = "10.3.1.0/24"
-        }
-        "zone-b" = {
-            name = "ap-northeast-2b"
-            cidr = "10.3.2.0/24"
-        }
-        "zone-c" = {
-            name = "ap-northeast-2c"
-            cidr = "10.3.3.0/24"
-        }
-        "zone-d" = {
-            name = "ap-northeast-2d"
-            cidr = "10.3.4.0/24"
-        }
+  description = "Subnet available zone & cidr"
+  type        = map(map(string))
+  default = {
+    "zone-a" = {
+      name = "ap-northeast-2a"
+      cidr = "10.3.1.0/24"
     }
-  
+    "zone-b" = {
+      name = "ap-northeast-2b"
+      cidr = "10.3.2.0/24"
+    }
+    "zone-c" = {
+      name = "ap-northeast-2c"
+      cidr = "10.3.3.0/24"
+    }
+    "zone-d" = {
+      name = "ap-northeast-2d"
+      cidr = "10.3.4.0/24"
+    }
+  }
+
 }

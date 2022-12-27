@@ -6,10 +6,10 @@ resource "aws_subnet" "subnets" {
     availability_zone = each.value.name
     cidr_block = each.value.cidr
 
-    map_public_ip_on_launch = true
+    map_public_ip_on_launch = var.public_ip_on
     
     tags = {
-    Name = "${var.vpc_id}-${each.value.name}"
+    Name = var.vpc_name
     # Name = module.vpc_hq.vpcHq.id
     }
 }
