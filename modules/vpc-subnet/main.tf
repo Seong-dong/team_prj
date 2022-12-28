@@ -6,7 +6,7 @@ resource "aws_subnet" "subnets" {
     availability_zone = each.value.name
     cidr_block = each.value.cidr
 
-    map_public_ip_on_launch = var.public_ip_on
+    map_public_ip_on_launch = var.public_ip_on ? true : false
     
     tags = {
     Name = var.vpc_name
