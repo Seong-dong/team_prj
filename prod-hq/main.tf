@@ -29,6 +29,12 @@ locals {
   tcp_protocol  = "tcp"
   icmp_protocol = "icmp"
   all_ips       = ["0.0.0.0/0"]
+
+  node_group_scaling_config = {
+    desired_size = 2
+    max_size     = 4
+    min_size     = 1
+  }
 }
 
 // GET 계정정보
@@ -51,7 +57,7 @@ data "aws_iam_policy_document" "eks_node_group_role" {
 
     principals {
       type        = "Service"
-      identifiers = ["eks-nodegroup.amazonaws.com"]
+      identifiers = ["ec2.amazonaws.com"]
     }
   }
 }
@@ -213,16 +219,34 @@ module "eks_sg_egress_all" {
 }
 
 module "eks_cluster" {
-  source            = "../modules/eks-cluster"
-  name = local.common_tags.project
+  source       = "../modules/eks-cluster"
+  name         = local.common_tags.project
   iam_role_arn = module.eks_cluster_iam.iam_arn
-  sg_list = [module.eks_sg.sg_id]
-  subnet_list = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+  sg_list      = [module.eks_sg.sg_id]
+  subnet_list  = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
 
   depends_on = [
     module.eks_cluster_iam,
     module.eks_sg,
     module.vpc_hq
+  ]
+}
+
+module "eks_node_group" {
+  source          = "../modules/eks-node-group"
+  node_group_name = "${local.common_tags.project}-ng"
+  cluster_name    = module.eks_cluster.cluster_name
+  # iam_role_arn    = module.eks_nodegroup_iam.iam_arn
+  iam_role_arn = "arn:aws:iam::448559955338:role/eks-nodegroup-test"
+  subnet_list     = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+
+  desired_size = local.node_group_scaling_config.desired_size
+  max_size     = local.node_group_scaling_config.max_size
+  min_size     = local.node_group_scaling_config.min_size
+
+  depends_on = [
+    module.eks_nodegroup_iam,
+    module.eks_cluster,
   ]
 }
 # EKS테스트 할때 활성
