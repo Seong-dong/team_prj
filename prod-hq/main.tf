@@ -198,7 +198,6 @@ module "eks_sg_ingress_http" {
   security_group_id = module.eks_sg.sg_id
 
   tag_name = each.key
-
 }
 
 module "eks_sg_egress_all" {
@@ -211,7 +210,20 @@ module "eks_sg_egress_all" {
   security_group_id = module.eks_sg.sg_id
 
   tag_name = "egress-all"
+}
 
+module "eks_cluster" {
+  source            = "../modules/eks-cluster"
+  name = local.common_tags.project
+  iam_role_arn = module.eks_cluster_iam.iam_arn
+  sg_list = [module.eks_sg.sg_id]
+  subnet_list = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+
+  depends_on = [
+    module.eks_cluster_iam,
+    module.eks_sg,
+    module.vpc_hq
+  ]
 }
 # EKS테스트 할때 활성
 # module "ecr" {
