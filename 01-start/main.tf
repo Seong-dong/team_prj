@@ -4,11 +4,27 @@ provider "aws" {
 
 
 
-resource "aws_instance" "ubuntu" {
-  ami           = "ami-0ab04b3ccbadfae1f"
-  instance_type = "t2.micro"
+resource "aws_iam_role" "iam-role" {
+  name = "eks-cluster-test"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : [
+            "eks.amazonaws.com"
+          ]
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
 
   tags = {
-    Name = "tf-ubuntu"
+    tag-key = "eks-cluster-rule"
   }
 }

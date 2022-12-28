@@ -1,0 +1,23 @@
+resource "aws_iam_role" "iam-role" {
+  name               = var.iam_name
+  assume_role_policy = var.policy
+
+  tags = {
+    tag-key = var.tag_name
+  }
+}
+
+# {
+#     "Version" : "2012-10-17",
+#     "Statement" : [
+#       {
+#         "Effect" : "Allow",
+#         "Principal" : {
+#           "Service" : [
+#             "eks.amazonaws.com"
+#           ]
+#         },
+#         "Action" : "sts:AssumeRole"
+#       }
+#     ]
+#   }
