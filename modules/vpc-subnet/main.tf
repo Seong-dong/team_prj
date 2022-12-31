@@ -10,6 +10,7 @@ resource "aws_subnet" "subnets" {
     
     tags = {
     Name = var.vpc_name
+    "kubernetes.io/role/elb" = 1
     # Name = module.vpc_hq.vpcHq.id
     }
 }

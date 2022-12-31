@@ -8,3 +8,9 @@ output "subnet" {
   description = "The name of vpc hq id"
   value       = module.subnet_public.subnet
 }
+
+output "vpc_id" {
+  description = "vpc_id"
+  value = module.vpc_hq.vpc_hq_id
+  
+}

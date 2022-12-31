@@ -3,11 +3,13 @@ provider "aws" {
   region = "ap-northeast-2"
 
   #2.x버전의 AWS공급자 허용
-  version = "~> 2.0"
+  version = "~> 3.0"
 
 }
 
 locals {
+  vpc_id = data.terraform_remote_state.hq_vpc_id.outputs.vpc_id
+  public_subnet = data.terraform_remote_state.hq_vpc_id.outputs.subnet
   common_tags = {
     project = "22shop"
     owner   = "icurfer"
@@ -62,56 +64,17 @@ data "aws_iam_policy_document" "eks_node_group_role" {
   }
 }
 
-# module "vpc_hq" {
-module "vpc_hq" {
-  source = "../modules/vpc"
-  #   source = "github.com/Seong-dong/team_prj/tree/main/modules/vpc"
-  tag_name   = "${local.common_tags.project}-vpc"
-  cidr_block = "10.3.0.0/16"
+// 테라폼클라우드
+data "terraform_remote_state" "hq_vpc_id" {
+  backend = "remote"
 
-}
+  config = {
+    organization = "22shop"
 
-module "vpc_igw" {
-  source = "../modules/igw"
-
-  vpc_id = module.vpc_hq.vpc_hq_id
-
-  tag_name = "${local.common_tags.project}-vpc_igw"
-
-  depends_on = [
-    module.vpc_hq
-  ]
-}
-
-module "subnet_public" {
-  source = "../modules/vpc-subnet"
-
-  vpc_id         = module.vpc_hq.vpc_hq_id
-  subnet-az-list = var.subnet-az-public
-  public_ip_on   = true
-  vpc_name       = "${local.common_tags.project}-public"
-}
-
-// public route
-module "route_public" {
-  source   = "../modules/route-table"
-  tag_name = "${local.common_tags.project}-route_table"
-  vpc_id   = module.vpc_hq.vpc_hq_id
-
-}
-
-module "route_add" {
-  source          = "../modules/route-add"
-  route_public_id = module.route_public.route_public_id
-  igw_id          = module.vpc_igw.igw_id
-}
-
-module "route_association" {
-  source         = "../modules/route-association"
-  route_table_id = module.route_public.route_public_id
-
-  association_count = 2
-  subnet_ids        = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id]
+    workspaces = {
+      name = "tf-22shop-network"
+    }
+  }
 }
 
 // eks 클러스터 역할 생성
@@ -186,11 +149,9 @@ module "eks_nodegroup_iam_att_3" {
 module "eks_sg" {
   source  = "../modules/sg"
   sg_name = "${local.common_tags.project}-sg"
-  vpc_id  = module.vpc_hq.vpc_hq_id
+  # vpc_id  = module.vpc_hq.vpc_hq_id
+  vpc_id = local.vpc_id
 
-  depends_on = [
-    module.vpc_hq
-  ]
 }
 
 module "eks_sg_ingress_http" {
@@ -223,13 +184,16 @@ module "eks_cluster" {
   name         = local.common_tags.project
   iam_role_arn = module.eks_cluster_iam.iam_arn
   sg_list      = [module.eks_sg.sg_id]
-  subnet_list  = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+  # subnet_list  = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+  subnet_list  = [local.public_subnet.zone-a.id, local.public_subnet.zone-c.id]
 
   depends_on = [
     module.eks_cluster_iam,
     module.eks_sg,
-    module.vpc_hq
   ]
+
+  client_id = data.aws_caller_identity.this.id  
+  
 }
 
 module "eks_node_group" {
@@ -238,7 +202,8 @@ module "eks_node_group" {
   cluster_name    = module.eks_cluster.cluster_name
   # iam_role_arn    = module.eks_nodegroup_iam.iam_arn
   iam_role_arn = "arn:aws:iam::448559955338:role/eks-nodegroup-test"
-  subnet_list     = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+  # subnet_list  = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
+  subnet_list  = [local.public_subnet.zone-a.id, local.public_subnet.zone-c.id]
 
   desired_size = local.node_group_scaling_config.desired_size
   max_size     = local.node_group_scaling_config.max_size

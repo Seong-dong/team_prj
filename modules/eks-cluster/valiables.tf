@@ -12,3 +12,8 @@ variable "subnet_list" {
   type = list(string)
 
 }
+
+variable "client_id" {
+  type = string
+
+}
