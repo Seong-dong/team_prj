@@ -4,7 +4,7 @@ terraform {
     organization = "22shop"
 
     workspaces {
-      name = "tf-cloud-backend"
+      name = "tf-22shop-hq-efs"
     }
   }
 }

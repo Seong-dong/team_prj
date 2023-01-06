@@ -4,7 +4,7 @@ terraform {
     organization = "22shop"
 
     workspaces {
-      name = "tf-cloud-eks"
+      name = "tf-22shop-idc-network"
     }
   }
 }

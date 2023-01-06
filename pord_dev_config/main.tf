@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "cloud9_role" {
 module "ecr" {
     source = "../modules/ecr"
 
-    names_list = ["web"]
+    names_list = ["app"]
     //names_list = ["web", "nginx", "mariadb"]
 }
 

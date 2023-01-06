@@ -8,7 +8,7 @@ provider "aws" {
 }
 
 locals {
-  vpc_id = data.terraform_remote_state.hq_vpc_id.outputs.vpc_id
+  vpc_id        = data.terraform_remote_state.hq_vpc_id.outputs.vpc_id
   public_subnet = data.terraform_remote_state.hq_vpc_id.outputs.subnet
   common_tags = {
     project = "22shop"
@@ -16,7 +16,7 @@ locals {
 
   }
   tcp_port = {
-    any_port    = 0
+    # any_port    = 0
     http_port   = 80
     https_port  = 443
     ssh_port    = 22
@@ -185,15 +185,15 @@ module "eks_cluster" {
   iam_role_arn = module.eks_cluster_iam.iam_arn
   sg_list      = [module.eks_sg.sg_id]
   # subnet_list  = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
-  subnet_list  = [local.public_subnet.zone-a.id, local.public_subnet.zone-c.id]
+  subnet_list = [local.public_subnet.zone-a.id, local.public_subnet.zone-c.id]
 
   depends_on = [
     module.eks_cluster_iam,
     module.eks_sg,
   ]
 
-  client_id = data.aws_caller_identity.this.id  
-  
+  client_id = data.aws_caller_identity.this.id
+
 }
 
 module "eks_node_group" {
@@ -203,7 +203,7 @@ module "eks_node_group" {
   # iam_role_arn    = module.eks_nodegroup_iam.iam_arn
   iam_role_arn = "arn:aws:iam::448559955338:role/eks-nodegroup-test"
   # subnet_list  = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id] #변경해야될수있음.
-  subnet_list  = [local.public_subnet.zone-a.id, local.public_subnet.zone-c.id]
+  subnet_list = [local.public_subnet.zone-a.id, local.public_subnet.zone-c.id]
 
   desired_size = local.node_group_scaling_config.desired_size
   max_size     = local.node_group_scaling_config.max_size
@@ -214,26 +214,21 @@ module "eks_node_group" {
     module.eks_cluster,
   ]
 }
-# EKS테스트 할때 활성
-# module "ecr" {
-#     source = "../modules/ecr"
 
-#     names_list = ["web", "nginx", "mariadb"]
+# module "ng_sg_ingress_http" {
+#   # for_each          = local.tcp_port
+#   source            = "../modules/sg-rule-add"
+#   type              = "ingress"
+#   from_port         = "8080"
+#   to_port           = "8080"
+#   protocol          = local.tcp_protocol
+#   cidr_blocks       = local.all_ips
+#   security_group_id = module.eks_node_group.ng_sg
+
+#   tag_name = "test"
+
+#   depends_on = [
+#     module.eks_node_group
+#   ]
+
 # }
-
-/* 
-terraform_remote_state reference method
-terraform cloud
-*/
-# data "terraform_remote_state" "foo" {
-#   backend = "remote"
-
-#   config = {
-#     organization = "company"
-
-#     workspaces = {
-#       name = "workspace"
-#     }
-#   }
-# }
-
