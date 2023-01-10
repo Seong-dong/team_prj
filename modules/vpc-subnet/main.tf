@@ -10,7 +10,7 @@ resource "aws_subnet" "subnets" {
     
     tags = {
     Name = var.vpc_name
-    "kubernetes.io/role/elb" = 1
+    "kubernetes.io/role/elb" = "${var.k8s_ingress ? 1 : 0}"
     # Name = module.vpc_hq.vpcHq.id
     }
 }

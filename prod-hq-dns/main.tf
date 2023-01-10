@@ -72,7 +72,7 @@ data "terraform_remote_state" "hq_vpc_id" {
     organization = "icurfer"
 
     workspaces = {
-      name = "tf-cloud-network"
+      name = "tf-22shop-network"
     }
   }
 }
@@ -209,26 +209,25 @@ module "eks_node_group" {
   max_size     = local.node_group_scaling_config.max_size
   min_size     = local.node_group_scaling_config.min_size
 
-
   depends_on = [
     module.eks_nodegroup_iam,
     module.eks_cluster,
   ]
 }
 
-# module "ng_sg_ingress_http" {
-#   # for_each          = local.tcp_port
-#   source            = "../modules/sg-rule-add"
-#   type              = "ingress"
-#   from_port         = "2049"
-#   to_port           = "2049"
-#   protocol          = local.tcp_protocol
-#   cidr_blocks       = local.all_ips
-#   security_group_id = module.eks_node_group.ng_sg
+module "ng_sg_ingress_http" {
+  # for_each          = local.tcp_port
+  source            = "../modules/sg-rule-add"
+  type              = "ingress"
+  from_port         = "2049"
+  to_port           = "2049"
+  protocol          = local.tcp_protocol
+  cidr_blocks       = local.all_ips
+  security_group_id = module.eks_node_group.ng_sg
 
-#   tag_name = "ng_sg_sub"
+  tag_name = "ng_sg_sub"
 
-#   depends_on = [
-#     module.eks_node_group
-#   ]
-# }
+  depends_on = [
+    module.eks_node_group
+  ]
+}

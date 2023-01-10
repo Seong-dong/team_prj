@@ -46,10 +46,10 @@ data "terraform_remote_state" "hq_vpc_id" {
   backend = "remote"
 
   config = {
-    organization = "22shop" // 초기 설정값
+    organization = "icurfer" // 초기 설정값
 
     workspaces = {
-      name = "tf-22shop-network"
+      name = "tf-cloud-network"
     }
   }
 }

@@ -4,7 +4,7 @@ terraform {
     organization = "icurfer"
 
     workspaces {
-      name = "tf-cloud-network"
+      name = "tf-cloud-dns"
     }
   }
 }

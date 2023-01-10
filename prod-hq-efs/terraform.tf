@@ -4,7 +4,7 @@ terraform {
     organization = "icurfer"
 
     workspaces {
-      name = "tf-22shop-hq-efs"
+      name = "tf-cloud-efs"
     }
   }
 }

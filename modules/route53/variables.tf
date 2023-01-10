@@ -3,7 +3,12 @@ variable "name" {
     type = string
 }
 
-variable "name" {
+variable "public" {
     description = "route53 name"
+    type = bool
+}
+
+variable "vpc_id" {
+    description = "vpc_id"
     type = string
 }

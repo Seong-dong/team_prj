@@ -34,3 +34,7 @@ variable "subnet-az-list" {
 variable "public_ip_on" {
   type = bool
 }
+
+variable "k8s_ingress" {
+  type = bool
+}

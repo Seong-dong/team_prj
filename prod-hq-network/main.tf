@@ -37,7 +37,7 @@ locals {
   }
 
   eks_ingress_type = {
-    public = "kubernetes.io/role/elb"
+    public  = "kubernetes.io/role/elb"
     private = "kubernetes.io/role/internal-elb=1"
   }
 }
@@ -96,7 +96,8 @@ module "subnet_public" {
   public_ip_on   = true
   # vpc_name       = "${local.common_tags.project}-public"
   #alb-ingress 생성을 위해 지정
-  vpc_name = local.eks_ingress_type.public 
+  k8s_ingress        = true
+  vpc_name = local.eks_ingress_type.public
 }
 
 // public route
@@ -121,62 +122,21 @@ module "route_association" {
   subnet_ids        = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id]
 }
 
-# // 보안그룹 생성
-# module "eks_sg" {
-#   source  = "../modules/sg"
-#   sg_name = "${local.common_tags.project}-sg"
-#   vpc_id  = module.vpc_hq.vpc_hq_id
+# // private subnet
+# module "subnet_private" {
+#   source = "../modules/vpc-subnet"
 
-#   depends_on = [
-#     module.vpc_hq
-#   ]
+#   vpc_id         = module.vpc_hq.vpc_hq_id
+#   subnet-az-list = var.subnet-az-private
+#   public_ip_on   = false
+#   k8s_ingress        = false
+#   #alb-ingress 생성을 위해 지정
+#   vpc_name = local.eks_ingress_type.public
 # }
 
-# module "eks_sg_ingress_http" {
-#   for_each          = local.tcp_port
-#   source            = "../modules/sg-rule-add"
-#   type              = "ingress"
-#   from_port         = each.value
-#   to_port           = each.value
-#   protocol          = local.tcp_protocol
-#   cidr_blocks       = local.all_ips
-#   security_group_id = module.eks_sg.sg_id
+# module "route_private" {
+#   source   = "../modules/route-table"
+#   tag_name = "${local.common_tags.project}-private_route_table"
+#   vpc_id   = module.vpc_hq.vpc_hq_id
 
-#   tag_name = each.key
 # }
-
-# module "eks_sg_egress_all" {
-#   source            = "../modules/sg-rule-add"
-#   type              = "egress"
-#   from_port         = local.any_protocol
-#   to_port           = local.any_protocol
-#   protocol          = local.any_protocol
-#   cidr_blocks       = local.all_ips
-#   security_group_id = module.eks_sg.sg_id
-
-#   tag_name = "egress-all"
-# }
-
-# EKS테스트 할때 활성
-# module "ecr" {
-#     source = "../modules/ecr"
-
-#     names_list = ["web", "nginx", "mariadb"]
-# }
-
-/* 
-terraform_remote_state reference method
-terraform cloud
-*/
-# data "terraform_remote_state" "foo" {
-#   backend = "remote"
-
-#   config = {
-#     organization = "company"
-
-#     workspaces = {
-#       name = "workspace"
-#     }
-#   }
-# }
-
