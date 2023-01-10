@@ -1,16 +1,17 @@
 // prod-hq-efs - main
 provider "aws" {
-  region = "ap-northeast-2"
-
-  #2.x버전의 AWS공급자 허용
+  region                  = "ap-northeast-2"
+  profile                 = "22shop"
+  shared_credentials_file = "C:/Users/aa/.aws/credentials"
+  #3.x버전의 AWS공급자 허용
   version = "~> 3.0"
-
 }
 
 locals {
   // 초기 설정값
   vpc_id        = data.terraform_remote_state.hq_vpc_id.outputs.vpc_id
-  public_subnet = data.terraform_remote_state.hq_vpc_id.outputs.subnet
+  # subnet = data.terraform_remote_state.hq_vpc_id.outputs.public_subnet
+  subnet = data.terraform_remote_state.hq_vpc_id.outputs.private_subnet
   common_tags = {
     project = "22shop-efs"
     owner   = "icurfer"
@@ -46,10 +47,10 @@ data "terraform_remote_state" "hq_vpc_id" {
   backend = "remote"
 
   config = {
-    organization = "icurfer" // 초기 설정값
+    organization = "22shop"
 
     workspaces = {
-      name = "tf-cloud-network"
+      name = "hq-network"
     }
   }
 }
@@ -92,10 +93,10 @@ module "efs_fs" {
   
 }
 
-module "efs-mnt_tg" {
+module "efs-mnt_tg1" {
   source            = "../modules/efs-mnt-tg"
   fs_id = module.efs_fs.efs_fs_id
-  subnet_id = "${local.public_subnet.zone-a.id}"
+  subnet_id = "${local.subnet.zone-a.id}"
   sg_list = [module.efs_sg.sg_id]
   
   depends_on = [
@@ -103,10 +104,10 @@ module "efs-mnt_tg" {
   ]
 }
 
-module "efs-mnt_t2" {
+module "efs-mnt_tg2" {
   source            = "../modules/efs-mnt-tg"
   fs_id = module.efs_fs.efs_fs_id
-  subnet_id = "${local.public_subnet.zone-c.id}"
+  subnet_id = "${local.subnet.zone-c.id}"
   sg_list = [module.efs_sg.sg_id]
   
   depends_on = [

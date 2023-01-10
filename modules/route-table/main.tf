@@ -4,7 +4,7 @@
 */
 
 //public
-resource "aws_route_table" "public-table" {
+resource "aws_route_table" "rt-tbl" {
   vpc_id = var.vpc_id
   tags = {
     Name = "${var.tag_name}-route-public"

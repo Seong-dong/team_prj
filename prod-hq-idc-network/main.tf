@@ -1,8 +1,9 @@
 // prod - main
 provider "aws" {
-  region = "ap-northeast-2"
-
-  #2.x버전의 AWS공급자 허용
+  region                  = "ap-northeast-2"
+  profile                 = "22shop"
+  shared_credentials_file = "C:/Users/aa/.aws/credentials"
+  #3.x버전의 AWS공급자 허용
   version = "~> 3.0"
 
 }
@@ -14,9 +15,11 @@ locals {
     owner   = "icurfer"
   }
   cidr = {
-    vpc = "10.4.0.0/16"
-    zone_a = "10.4.1.0/24"
-    zone_c = "10.4.3.0/24"
+    vpc    = "10.3.0.0/16"
+    zone_a = "10.3.1.0/24"
+    zone_c = "10.3.3.0/24"
+    zone_b = "10.3.2.0/24"
+    zone_d = "10.3.4.0/24"
   }
   tcp_port = {
     any_port    = 0
@@ -26,7 +29,7 @@ locals {
     dns_port    = 53
     django_port = 8000
     mysql_port  = 3306
-    nfs_port = 2049
+    nfs_port    = 2049
   }
   udp_port = {
     dns_port = 53
@@ -40,23 +43,11 @@ locals {
 // GET 계정정보
 data "aws_caller_identity" "this" {}
 
-// eks를 위한 iam역할 생성 데이터 조회
-# data "aws_iam_policy_document" "eks-assume-role-policy" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
-
-#     principals {
-#       type        = "Service"
-#       identifiers = ["eks.amazonaws.com"]
-#     }
-#   }
-# }
-
 # module "vpc_hq" {
 module "vpc_hq" {
   source = "../modules/vpc"
   #   source = "github.com/Seong-dong/team_prj/tree/main/modules/vpc"
-  tag_name   = "${local.common_tags.project}-vpc"
+  tag_name   = "${local.common_tags.project}-hq-vpc"
   cidr_block = local.cidr.vpc
 
 }
@@ -66,7 +57,7 @@ module "vpc_igw" {
 
   vpc_id = module.vpc_hq.vpc_hq_id
 
-  tag_name = "${local.common_tags.project}-vpc_igw"
+  tag_name = "${local.common_tags.project}-hq-igw"
 
   depends_on = [
     module.vpc_hq
@@ -76,7 +67,7 @@ module "vpc_igw" {
 module "subnet_public" {
   source = "../modules/vpc-subnet"
 
-  vpc_id         = module.vpc_hq.vpc_hq_id
+  vpc_id = module.vpc_hq.vpc_hq_id
   # subnet-az-list = var.subnet-az-public
   subnet-az-list = {
     "zone-a" = {
@@ -88,16 +79,16 @@ module "subnet_public" {
       cidr = local.cidr.zone_c
     }
   }
-  public_ip_on   = true
+  public_ip_on = true
   # vpc_name       = "${local.common_tags.project}-public"
   #alb-ingress 생성을 위해 지정
-  vpc_name = "${local.common_tags.project}-vpc"
+  vpc_name = "${local.common_tags.project}-public"
 }
 
 // public route
 module "route_public" {
   source   = "../modules/route-table"
-  tag_name = "${local.common_tags.project}-route_table"
+  tag_name = "${local.common_tags.project}-hq-rt-tbl"
   vpc_id   = module.vpc_hq.vpc_hq_id
 
 }
@@ -114,4 +105,26 @@ module "route_association" {
 
   association_count = 2
   subnet_ids        = [module.subnet_public.subnet.zone-a.id, module.subnet_public.subnet.zone-c.id]
+}
+
+
+module "subnet_private" {
+  source = "../modules/vpc-subnet"
+
+  vpc_id = module.vpc_hq.vpc_hq_id
+  # subnet-az-list = var.subnet-az-public
+  subnet-az-list = {
+    "zone-b" = {
+      name = "${local.region}b"
+      cidr = local.cidr.zone_b
+    }
+    "zone-d" = {
+      name = "${local.region}d"
+      cidr = local.cidr.zone_d
+    }
+  }
+  public_ip_on = false
+  # vpc_name       = "${local.common_tags.project}-public"
+  #alb-ingress 생성을 위해 지정
+  vpc_name = "${local.common_tags.project}-hq-private"
 }

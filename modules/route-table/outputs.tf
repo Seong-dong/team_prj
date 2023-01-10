@@ -1,5 +1,5 @@
-output "route_public_id" {
+output "route_id" {
     description = "get route_public_id"
-    value = aws_route_table.public-table.id
+    value = aws_route_table.rt-tbl.id
 
 }

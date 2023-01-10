@@ -31,6 +31,7 @@ variable "subnet-az-list" {
     # }
 }
 
+
 variable "public_ip_on" {
   type = bool
 }

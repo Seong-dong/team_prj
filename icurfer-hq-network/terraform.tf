@@ -4,7 +4,7 @@ terraform {
     organization = "22shop"
 
     workspaces {
-      name = "hq-network"
+      name = "tf-cloud-network"
     }
   }
 }

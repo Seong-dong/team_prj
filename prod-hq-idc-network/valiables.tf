@@ -29,17 +29,17 @@ variable "prod_name" {
 #     }
 #   }
 # }
-variable "subnet-az-private" {
-  description = "Subnet available zone & cidr"
-  type        = map(map(string))
-  default = {
-    "zone-b" = {
-      name = "ap-northeast-2b"
-      cidr = "10.3.2.0/24"
-    }
-    "zone-d" = {
-      name = "ap-northeast-2d"
-      cidr = "10.3.4.0/24"
-    }
-  }
-}
+# variable "subnet-az-private" {
+#   description = "Subnet available zone & cidr"
+#   type        = map(map(string))
+  # default = {
+  #   "zone-b" = {
+  #     name = "ap-northeast-2b"
+  #     cidr = "10.3.2.0/24"
+  #   }
+  #   "zone-d" = {
+  #     name = "ap-northeast-2d"
+  #     cidr = "10.3.4.0/24"
+  #   }
+  # }
+# }

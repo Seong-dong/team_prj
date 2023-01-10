@@ -9,8 +9,8 @@ resource "aws_subnet" "subnets" {
     map_public_ip_on_launch = var.public_ip_on ? true : false
     
     tags = {
-    Name = var.vpc_name
+    Name = "${var.public_ip_on ? "22shop-eks-public" : "22shop-eks-private"}"
     "kubernetes.io/role/elb" = "${var.k8s_ingress ? 1 : 0}"
-    # Name = module.vpc_hq.vpcHq.id
+    "kubernetes.io/role/internal-elb" = "${var.k8s_ingress ? 0 : 1}"
     }
 }
