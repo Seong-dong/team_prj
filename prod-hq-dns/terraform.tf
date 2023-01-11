@@ -1,10 +1,10 @@
 terraform {
   backend "remote"{
     hostname = "app.terraform.io"
-    organization = "icurfer"
+    organization = "22shop"
 
     workspaces {
-      name = "tf-cloud-dns"
+      name = "hq-dns"
     }
   }
 }
