@@ -4,7 +4,7 @@ terraform {
     organization = "22shop"
 
     workspaces {
-      name = "idc-network"
+      name = "common-tgw-sdjo"
     }
   }
 }

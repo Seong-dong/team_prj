@@ -70,8 +70,8 @@ resource "aws_route53_record" "www" {
   type    = "A"
 
   alias {
-    name                   = "k8s-22shopekscluster-42f56c4a0b-158144463.ap-northeast-2.elb.amazonaws.com"
-    zone_id                = "ZWKZPGTI48KDX"
+    name                   = "k8s-22shopekscluster-42f56c4a0b-271383680.ap-northeast-2.elb.amazonaws.com"
+    zone_id                = "ZWKZPGTI48KDX" //rt53이아니고 로드밸런서 호스팅영역
     evaluate_target_health = true
   }
 }

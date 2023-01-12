@@ -147,7 +147,7 @@ module "nat_gw" {
 // public route
 module "route_public" {
   source   = "../modules/route-table"
-  tag_name = "${local.common_tags.project}-route_table"
+  tag_name = "${local.common_tags.project}-public_tbl-sdjo"
   vpc_id   = module.vpc_hq.vpc_hq_id
 
 }
@@ -157,6 +157,7 @@ module "route_add" {
   route_id = module.route_public.route_id
   igw_id   = module.vpc_igw.igw_id
   gw_type  = "igw"
+  destination_cidr = "0.0.0.0/0"
 }
 
 module "route_association" {
@@ -193,7 +194,7 @@ module "subnet_private" {
 // private route
 module "route_private" {
   source   = "../modules/route-table"
-  tag_name = "${local.common_tags.project}-private_tbl"
+  tag_name = "${local.common_tags.project}-private_tbl-sdjo"
   vpc_id   = module.vpc_hq.vpc_hq_id
 
 }
@@ -202,6 +203,7 @@ module "route_add_nat" {
   route_id = module.route_private.route_id
   nat_id   = module.nat_gw.nat_id
   gw_type  = "nat"
+  destination_cidr = "0.0.0.0/0"
 }
 module "route_association_nat" {
   source         = "../modules/route-association"
@@ -237,7 +239,7 @@ module "subnet_private_tgw" {
 // private route
 module "route_private_tgw" {
   source   = "../modules/route-table"
-  tag_name = "${local.common_tags.project}-private_tbl_tgw"
+  tag_name = "${local.common_tags.project}-private_tbl_tgw-sdjo"
   vpc_id   = module.vpc_hq.vpc_hq_id
 
 }
