@@ -14,6 +14,6 @@ data "aws_caller_identity" "this" {}
 module "ecr" {
   source = "../modules/ecr"
 
-  names_list = ["app"]
+  names_list = ["app", "shop"]
   //names_list = ["web", "nginx", "mariadb"]
 }

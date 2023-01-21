@@ -57,7 +57,8 @@ locals {
 }
 module "ec2_bastion" {
   source = "../modules/ec2"
-  ami_name = "ami-035233c9da2fabf52" //amazon linux
+  # ami_name = "ami-035233c9da2fabf52" //amazon linux
+  ami_name = "ami-0ee5d9d505bab04d3" //custom
   instance_type = "t2.micro"
   tag_name = "bastion"
   public_ip_associate = true

@@ -2,7 +2,7 @@ resource "aws_eks_cluster" "eks-cluster" {
   name     = "${var.name}"
   role_arn = var.iam_role_arn
 
-  #enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  # enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   vpc_config {
     security_group_ids = var.sg_list

@@ -80,6 +80,19 @@ data "terraform_remote_state" "hidc_vpc_id" {
     }
   }
 }
+// widc-ec2
+data "terraform_remote_state" "widc_ec2" {
+  backend = "remote"
+
+  config = {
+    organization = "22shop"
+
+    workspaces = {
+      name = "widc-ec2-bkkim"
+    }
+  }
+}
+
 locals {
   account_id = data.aws_caller_identity.this.account_id
 
@@ -91,6 +104,7 @@ locals {
   web_subnet  = data.terraform_remote_state.web_vpc_id.outputs.private_subnet_tgw
   hidc_subnet = data.terraform_remote_state.hidc_vpc_id.outputs.private_subnet
 
+  cgw_ip = data.terraform_remote_state.widc_ec2.outputs.eip
 }
 
 // tg 생성
@@ -175,5 +189,58 @@ module "route_add_web_private" {
 
   depends_on = [
     module.tgw
+  ]
+}
+
+
+module "route_add_hidc_public" {
+  source           = "../modules/route-add"
+  route_id         = data.terraform_remote_state.hidc_vpc_id.outputs.route_public_id
+  tgw_id           = module.tgw.tgw_id
+  gw_type          = "tgw"
+  destination_cidr = "10.0.0.0/8"
+
+  depends_on = [
+    module.tgw
+  ]
+}
+
+module "route_add_hidc_private" {
+  source           = "../modules/route-add"
+  route_id         = data.terraform_remote_state.hidc_vpc_id.outputs.route_private_id
+  tgw_id           = module.tgw.tgw_id
+  gw_type          = "tgw"
+  destination_cidr = "10.0.0.0/8"
+
+  depends_on = [
+    module.tgw
+  ]
+}
+
+module "cgw" {
+  source = "../modules/cgw"
+  cgw_ip = local.cgw_ip
+}
+
+module "vpn_conn" {
+  source = "../modules/vpn_conn"
+  cgw_id = module.cgw.cgw_id
+  tgw_id = module.tgw.tgw_id
+  preshared_key = "cloudneta"
+  depends_on = [
+    module.tgw,
+    module.cgw
+  ]
+}
+
+module "transit-gateway-route-add" {
+  source         = "../modules/transit-gateway-route-add"
+  cidr           = "10.2.0.0/16"
+  route_table_id = module.tgw.tgw_route-table_id
+  attatch_id     = module.vpn_conn.attach_id
+
+  depends_on = [
+    module.tgw,
+    module.cgw
   ]
 }

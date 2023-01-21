@@ -34,3 +34,4 @@ variable "sg_list" {
   type = list(string)
   
 }
+

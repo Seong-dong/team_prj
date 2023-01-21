@@ -10,7 +10,6 @@ provider "aws" {
 
 
 locals {
-  vpc_id = data.terraform_remote_state.hq_vpc_id.outputs.vpc_id
   common_tags = {
     project = "22shop"
     owner   = "icurfer"
@@ -70,7 +69,7 @@ resource "aws_route53_record" "www" {
   type    = "A"
 
   alias {
-    name                   = "k8s-22shopekscluster-42f56c4a0b-271383680.ap-northeast-2.elb.amazonaws.com"
+    name                   = "k8s-22shopekscluster-42f56c4a0b-625381113.ap-northeast-2.elb.amazonaws.com"
     zone_id                = "ZWKZPGTI48KDX" //rt53이아니고 로드밸런서 호스팅영역
     evaluate_target_health = true
   }

@@ -7,11 +7,13 @@ resource "aws_network_interface" "eni" {
   }
 }
 
-resource "aws_instance" "ubuntu" {
+resource "aws_instance" "ec2" {
   ami = var.ami_name
   # "ami-0ab04b3ccbadfae1f"
   instance_type = var.instance_type
   # "t2.micro"
+  
+  # user_data = var.user_data
 
   tags = {
     Name = "${var.tag_name}"
